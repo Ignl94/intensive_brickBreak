@@ -8,7 +8,7 @@ var y = canvas.height-30;
 var dx = 2;
 var dy = -2;
 // ball radius variable //
-var ballRadius = 10
+var ballRadius = 10;
 
 // paddle variables //
 var paddleHeight = 10;
@@ -19,6 +19,9 @@ var paddleX = (canvas.width - paddleWidth) / 2;
 var rightPressed = false;
 var leftPressed = false;
 
+// score variable //
+var score = 0;
+
 // Brick Variables //
 var brickRowCount = 3;
 var brickColumnCount = 5;
@@ -27,7 +30,7 @@ var brickHeight = 20;
 var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
-var bricks = []
+var bricks = [];
 for(var c=0; c<brickColumnCount; c++) {
     bricks[c] = [];
     for(var r=0; r<brickRowCount; r++) {
@@ -40,6 +43,8 @@ function draw() {
     drawBricks();
     drawBall();
     drawPaddle();
+    collisionDetection();
+    drawScore();
     if(x+dx > canvas.width-ballRadius || x+dx < ballRadius) {
         dx = -dx;
     }
@@ -86,7 +91,7 @@ function drawPaddle() {
     ctx.beginPath();
     ctx.rect(paddleX, canvas.height-paddleHeight,paddleWidth,paddleHeight);
     ctx.fillStyle = "#0095DD";
-    ctx.fill()
+    ctx.fill();
     ctx.closePath();
 }
 
@@ -113,11 +118,27 @@ function collisionDetection() {
     for(var c=0; c<brickColumnCount; c++) {
         for(var r=0; r<brickRowCount; r++) {
             var b = bricks[c][r];
-            if(x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-                dy = -dy;
+            if(b.status == 1) {
+                if(x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                    score++;
+                    if(score == brickRowCount * brickColumnCount) {
+                        alert("YOU WIN, CONGRATULATIONS!");
+                        document.location.reload();
+                        clearInterval(interval);
+                    }
+                }
             }
+            
         } 
     }
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: " + score, 8, 20);
 }
 
 function keyDownHandler(e) {
